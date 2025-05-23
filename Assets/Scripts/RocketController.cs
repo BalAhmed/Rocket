@@ -1,11 +1,21 @@
+using TMPro;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {
     public float upSpeed = 0.5f;
     public float moveSpeed = 1.0f;
-    public float tiltAngle = 20f; // Maksimum sa�/sol e�im
-    public float tiltSpeed = 5f;  // D�n��lerin ne kadar h�zl� olaca��
+    public float tiltAngle = 20f; // Eğim
+    public float tiltSpeed = 5f;  // Dönüş Hızı
+    public float maxFuel = 100f;
+    public float currentFuel;
+    public float fuelConsumpttionRate = 0.50f;
+    public float score = 0;
+    public Transform rocketTransform;
+    public float baseHight;
+    public TMP_Text fuelText;
+    public TMP_Text scoreText;
 
     private Rigidbody2D rb;
     private float targetRotationZ = 0f;
@@ -13,12 +23,15 @@ public class RocketController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        currentFuel = maxFuel;
+        baseHight = rocketTransform.position.y;
     }
 
     void Update()
     {
         // Yukar� do�ru sabit h�zla hareket
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, upSpeed);
+        
 
         if (Input.touchCount > 0)
         {
@@ -43,6 +56,22 @@ public class RocketController : MonoBehaviour
                     rb.linearVelocity = new Vector2(0f, upSpeed);
                     targetRotationZ = 0f; // d�z hale geri d�n
                     break;
+            }
+
+            
+        }
+        if (currentFuel > 0)
+        {
+            currentFuel -= fuelConsumpttionRate * Time.deltaTime;
+            fuelText.text = ("Fuel:") + ((int)currentFuel).ToString();
+            float height = rocketTransform.position.y - baseHight;
+            score = Mathf.FloorToInt(height);
+            scoreText.text = score.ToString();
+
+            if (currentFuel <= 0)
+            {
+                currentFuel = 0;
+                Debug.Log("No Fuel!");
             }
         }
 
