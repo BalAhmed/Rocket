@@ -1,14 +1,27 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class GameController : MonoBehaviour
 {
+    
     public GameObject rocket;
     public GameObject[] spawner;
     public GameObject[] obstacle;
+    public int poolSizePerType = 10;
+    private List<GameObject> pool = new List<GameObject>();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        foreach(GameObject prefab in obstacle)
+        {
+            for ( int i = 0; i < poolSizePerType; i++)
+            {
+                GameObject obj = Instantiate(prefab);
+                obj.SetActive(false);
+                pool.Add(obj);
+            }
+        }
         rocket = GameObject.Find("Rocket");
         InvokeRepeating("SpwanerObstacle", 2,2);
     }
@@ -24,9 +37,26 @@ public class GameController : MonoBehaviour
         int randomSpawnerIndex = Random.Range(0, spawner.Length);
         Vector3 selectedSpawnerPos = spawner[randomSpawnerIndex].transform.position;
 
-        int randomObstacleIndex = Random.Range(0, obstacle.Length);
-        GameObject selectedObstacle = obstacle[randomObstacleIndex];
+        List<GameObject> inactiveObstacles = pool.FindAll(o => !o.activeInHierarchy);
 
-        Instantiate(selectedObstacle, selectedSpawnerPos, Quaternion.identity);
+        if (inactiveObstacles.Count == 0)
+            return; // Hepsi aktifse hiçbir þey yapma
+
+        // 3. Rastgele bir tanesini seç
+        GameObject pooledObstacle = inactiveObstacles[Random.Range(0, inactiveObstacles.Count)];
+
+        // 4. Pozisyonunu ayarla ve aktif et
+        pooledObstacle.transform.position = selectedSpawnerPos;
+        pooledObstacle.transform.rotation = Quaternion.identity;
+        pooledObstacle.SetActive(true);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            collision.gameObject.SetActive(false);
+        }
+
     }
 }

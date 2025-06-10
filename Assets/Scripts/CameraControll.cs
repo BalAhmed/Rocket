@@ -15,4 +15,7 @@ public class CameraControll : MonoBehaviour
     {
         transform.position = new Vector3 (transform.rotation.x ,rocket.transform.position.y + 4, rocket.transform.position.z -10);
     }
+
+
+  
 }
