@@ -23,7 +23,9 @@ public class GameController : MonoBehaviour
             }
         }
         rocket = GameObject.Find("Rocket");
-        InvokeRepeating("SpwanerObstacle", 2,2);
+
+            InvokeRepeating("SpwanerObstacle", 2, 2);
+      
     }
 
     // Update is called once per frame
@@ -34,25 +36,30 @@ public class GameController : MonoBehaviour
 
     public void SpwanerObstacle()
     {
-        int randomSpawnerIndex = Random.Range(0, spawner.Length);
-        Vector3 selectedSpawnerPos = spawner[randomSpawnerIndex].transform.position;
+        if(RocketController.canPlay)
+        {
+            int randomSpawnerIndex = Random.Range(0, spawner.Length);
+            Vector3 selectedSpawnerPos = spawner[randomSpawnerIndex].transform.position;
 
-        List<GameObject> inactiveObstacles = pool.FindAll(o => !o.activeInHierarchy);
+            List<GameObject> inactiveObstacles = pool.FindAll(o => !o.activeInHierarchy);
 
-        if (inactiveObstacles.Count == 0)
-            return; // Hepsi aktifse hiçbir þey yapma
+            if (inactiveObstacles.Count == 0)
+                return; // Hepsi aktifse hiçbir þey yapma
 
-        // 3. Rastgele bir tanesini seç
-        GameObject pooledObstacle = inactiveObstacles[Random.Range(0, inactiveObstacles.Count)];
+            // 3. Rastgele bir tanesini seç
+            GameObject pooledObstacle = inactiveObstacles[Random.Range(0, inactiveObstacles.Count)];
 
-        // 4. Pozisyonunu ayarla ve aktif et
-        pooledObstacle.transform.position = selectedSpawnerPos;
-        pooledObstacle.transform.rotation = Quaternion.identity;
-        pooledObstacle.SetActive(true);
+            // 4. Pozisyonunu ayarla ve aktif et
+            pooledObstacle.transform.position = selectedSpawnerPos;
+            pooledObstacle.transform.rotation = Quaternion.identity;
+            pooledObstacle.SetActive(true);
+        }
+       
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        //engelleri yok etme
         if (collision.gameObject.CompareTag("Obstacle"))
         {
             collision.gameObject.SetActive(false);
